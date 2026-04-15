@@ -1,14 +1,14 @@
-.navbar{
-    position:relative;
-    width: 100%;
-    margin-bottom: 20px;
-
+.app-navbar {
+  background: linear-gradient(90deg, #0b3d91 0%, #0d6efd 55%, #198754 100%);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.15);
 }
 
-.titulo{
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    text-shadow: 2px 2px 5px;
-    text-decoration: solid;
-    font-style: oblique;
-    font-weight: bold;
+.app-navbar .nav-link {
+  font-weight: 500;
+}
+
+.app-navbar .nav-item.active .nav-link {
+  color: #fff !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }

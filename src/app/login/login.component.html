@@ -1,39 +1,33 @@
+<div class="auth-layout">
+  <div class="auth-card auth-card--login">
+    <div class="auth-card__badge">EcoRecicla</div>
+    <h1 class="auth-brand">Acceso al sistema</h1>
+    <p class="auth-sub">Inicie sesión con su cuenta corporativa</p>
 
-<section class="vh-100">
-    <div class="container-fluid h-custom">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-md-9 col-lg-6 col-xl-5">
-          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-            class="img-fluid" alt="Sample image">
-        </div>
-        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+    <form (ngSubmit)="iniciarSesion()" #f="ngForm" class="auth-form">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Usuario</mat-label>
+        <input matInput id="username" name="username" [(ngModel)]="loginData.username"
+               required autocomplete="username" [disabled]="cargando">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Contraseña</mat-label>
+        <input matInput id="password" name="password" type="password" [(ngModel)]="loginData.password"
+               required autocomplete="current-password" [disabled]="cargando">
+      </mat-form-field>
 
-          <h2>Bienvenido</h2>
-          <form>
+      <button mat-flat-button color="primary" class="auth-submit w-100" type="submit"
+              [disabled]="!f.form.valid || cargando">
+        <span *ngIf="!cargando">Entrar</span>
+        <span *ngIf="cargando" class="d-inline-flex align-items-center justify-content-center">
+          <mat-progress-spinner diameter="22" mode="indeterminate" class="auth-spinner"></mat-progress-spinner>
+          <span class="ml-2">Validando…</span>
+        </span>
+      </button>
+    </form>
 
-  
-            <!-- Email input -->
-            <div class="form-outline mb-4">
-              <input type="email" id="form3Example3" class="form-control form-control-lg"
-                placeholder="Ingrese un nombre de usuario*" />
-              <label class="form-label" for="form3Example3">Nombre de usuario</label>
-            </div>
-  
-            <!-- Password input -->
-            <div class="form-outline mb-3">
-              <input type="password" id="form3Example4" class="form-control form-control-lg"
-                placeholder="Ingrese una contraseña*" />
-              <label class="form-label" for="form3Example4">Contraseña</label>
-            </div>
-  
-  
-            <div class = "container text-center">
-              <button mat-raised-button color="primary" routerLink="/inicio">Iniciar sesion</button>
-              <button type="reset" style = "margin-left: 20px;" mat-raised-button color="accent">Limpiar</button>
-            </div>
-  
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
+    <p class="auth-footer text-center mt-3 mb-0">
+      ¿No tiene cuenta? <a routerLink="/signup">Crear cuenta</a>
+    </p>
+  </div>
+</div>

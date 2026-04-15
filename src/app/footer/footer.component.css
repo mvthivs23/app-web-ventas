@@ -1,8 +1,4 @@
-.footer{
-    position: fixed;
-    bottom: 0px;
-    height: 60px;
-    width: 100%;
-
-  }
-  
+.app-footer {
+  background: linear-gradient(90deg, #0b3d91 0%, #0d6efd 55%, #198754 100%);
+  margin-top: 2rem;
+}

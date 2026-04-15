@@ -1,15 +1,33 @@
-.divider:after,
-.divider:before {
-content: "";
-flex: 1;
-height: 1px;
-background: #eee;
+.auth-card--login {
+  max-width: 440px;
+  border-top: 4px solid #0f766e;
 }
-.h-custom {
-height: calc(100% - 73px);
+
+.auth-card__badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0f766e;
+  margin-bottom: 0.5rem;
 }
-@media (max-width: 450px) {
-.h-custom {
-height: 100%;
+
+.auth-form .mat-mdc-form-field,
+.auth-form .mat-form-field {
+  margin-bottom: 0.25rem;
 }
+
+.auth-submit {
+  margin-top: 0.5rem;
+  height: 48px;
+  font-weight: 600;
+}
+
+.auth-spinner {
+  display: inline-block;
+}
+
+.auth-spinner ::ng-deep circle {
+  stroke: currentColor;
 }

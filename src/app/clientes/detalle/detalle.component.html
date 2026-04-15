@@ -1,91 +1,114 @@
 <div class="abrir-modal" *ngIf="modalService.modal">
-<div class="modal" tabindex="-1" role="dialog" style="display:block">
+  <div class="modal" tabindex="-1" role="dialog" style="display:block">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{titulo}}</h5>
-          <button (click)="cerrarModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h5 class="modal-title">{{ titulo }}</h5>
+          <button (click)="cerrarModal()" type="button" class="close" aria-label="Cerrar">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-            <div class="container">
-                <div class="row">
-                  <div class="col-sm">
-        <ul *ngIf="cliente" class="list-group text-dark">
-            <li class="list-group-item active">{{cliente.nombre}}</li>
-            <li class="list-group-item">Dirección: {{ cliente.ubicacion}}</li>
-            <li class="list-group-item">Email: {{ cliente.email}}</li>
-            <li class="list-group-item">Telefono: {{ cliente.telefono}}</li>
-            <li class="list-group-item">Estado:  <span *ngIf="cliente.eliminado; else active">Elminado</span><ng-template #active>Activo</ng-template>
-            </li>     
-        </ul>
-                
-            <div class="input-group" style="margin-top: 15px;">
+        <div class="modal-body" *ngIf="cliente">
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-group text-dark mb-3">
+                <li class="list-group-item active">{{ cliente.nombre }}</li>
+                <li class="list-group-item">Dirección: {{ cliente.ubicacion }}</li>
+                <li class="list-group-item">Email: {{ cliente.email }}</li>
+                <li class="list-group-item">Teléfono: {{ cliente.telefono }}</li>
+                <li class="list-group-item">
+                  Estado:
+                  <span *ngIf="cliente.eliminado; else active">Eliminado</span>
+                  <ng-template #active>Activo</ng-template>
+                </li>
+              </ul>
+              <div class="input-group mb-3">
                 <div class="custom-file">
-                  <input (change)="seleccionarFoto($event)" type="file" class="custom-file-input" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04">
-                  <label class="custom-file-label" for="inputGroupFile04">Seleccionar foto</label>
+                  <input (change)="seleccionarFoto($event)" type="file" class="custom-file-input" id="fotoCliente">
+                  <label class="custom-file-label" for="fotoCliente">Cambiar foto</label>
                 </div>
                 <div class="input-group-append">
-                  <button (click)="subirFoto()" class="btn btn-primary" type="button" id="inputGroupFileAddon04">Subir</button>
+                  <button (click)="subirFoto()" class="btn btn-primary" type="button">Subir</button>
                 </div>
               </div>
-              </div>
-              <div class="col-sm">
-                <img *ngIf="cliente?.foto" src="http://localhost:8080/api/uploads/img/{{cliente.foto}}" alt="{{cliente.foto}}" class="img-thumbnail rounded">
-              </div>
+              <a class="btn btn-success btn-sm mr-2" [routerLink]="['/ventas/form', cliente.id]"
+                      [disabled]="cliente.eliminado">Nuevo movimiento (con cliente)</a>
+              <a class="btn btn-outline-success btn-sm" routerLink="/compras-ventas/nueva" [disabled]="cliente.eliminado">Otro movimiento</a>
             </div>
-
-          
-            <div class="row">
-              <td><button type="button" class="btn btn-success btn-sm" style="margin-top: 20px;" [routerLink]="['/ventas/form', cliente.id]" [disabled]="cliente.eliminado==true" class="btn btn-primary">crear venta</button>
-                <td><button type="button" class="btn btn-success btn-sm" style="margin-top: 20px; margin-left: 10px;" [routerLink]="['/ventas/form', cliente.id]" [disabled]="cliente.eliminado==true" class="btn btn-success">Excel</button></td>
-                <td><button type="button" class="btn btn-success btn-sm" style="margin-top: 20px; margin-left: 10px;" [routerLink]="['/ventas/form', cliente.id]" [disabled]="cliente.eliminado==true" class="btn btn-danger">PDF</button></td>
-
+            <div class="col-md-6 text-center">
+              <img [src]="fotoUrl()" [alt]="cliente.nombre" class="img-fluid rounded shadow-sm">
             </div>
-            
+          </div>
 
-            <div class="row">
+          <h6 class="mt-4 mb-2">Historial de movimientos</h6>
+          <p class="text-muted small mb-2">Cada operación tiene un número ID. Filtre por fechas y tipo.</p>
+          <div class="form-row align-items-end mb-2">
+            <div class="form-group col-sm-4 mb-1">
+              <label class="small mb-0">Desde</label>
+              <input type="date" class="form-control form-control-sm" [(ngModel)]="desde" name="dDesde" />
+            </div>
+            <div class="form-group col-sm-4 mb-1">
+              <label class="small mb-0">Hasta</label>
+              <input type="date" class="form-control form-control-sm" [(ngModel)]="hasta" name="dHasta" />
+            </div>
+            <div class="form-group col-sm-4 mb-1">
+              <label class="small mb-0">Tipo</label>
+              <select class="form-control form-control-sm" [(ngModel)]="tipoFiltro" name="dTipo">
+                <option value="TODOS">Todos</option>
+                <option value="INGRESO">Ventas</option>
+                <option value="EGRESO">Compras</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-primary mb-3" (click)="cargarMovimientos()" [disabled]="cargandoMov">Actualizar historial</button>
 
-              <div class="alert alert-info my-4" *ngIf="cliente.ventas.length==0">
-                No hay ventas asignadas para el cliente {{cliente.nombre}}
-              </div>
+          <div *ngIf="cargandoMov" class="alert alert-light py-2 small">Cargando…</div>
 
-             <table class="table table-responsive table-striped my-4"
-             *ngIf="cliente.ventas.length>0">
-             <thead>
-              <tr>
-                <th>folio</th>
-                <th>descripcion</th>
-                <th>fecha</th>
-                <th>total</th>
-                <th>Detalle</th>
-                <th>Eliminar</th>
+          <div class="alert alert-info my-2" *ngIf="!cargandoMov && !(movimientos?.length)">
+            No hay movimientos en el rango seleccionado.
+          </div>
 
-              </tr>
-             </thead>
-             <tbody>
-              <tr *ngFor="let venta of cliente.ventas">
-                <td>{{venta.id}}</td>
-                <td>{{venta.descripcion}}</td>
-                <td>{{venta.createAt}}</td>
-                <td>{{venta.total}}</td>
-                 <td><button class="btn btn-primary btn-sm" type="button"
-                  [routerLink]="['/ventas', venta.id]">ver</button></td>
-                  <td><button class="btn btn-danger btn-sm" type="button"[disabled]="cliente.eliminado==true" (click)="delete(venta) ">eliminar</button></td>
-              </tr>
-             </tbody>
+          <div class="table-responsive" *ngIf="!cargandoMov && movimientos?.length > 0">
+            <table class="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Descripción</th>
+                  <th class="text-right">Total</th>
+                  <th>Retiro</th>
+                  <th></th>
+                  <th *ngIf="loginService.isAdmin()"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let venta of movimientos">
+                  <td><strong>#{{ venta.id }}</strong></td>
+                  <td>{{ venta.createAt | date:'dd/MM/y':'':'es' }}</td>
+                  <td>
+                    <span class="badge" [class.badge-success]="!esEgreso(venta)" [class.badge-danger]="esEgreso(venta)">
+                      {{ esEgreso(venta) ? 'Compra' : 'Venta' }}
+                    </span>
+                  </td>
+                  <td>{{ venta.descripcion }}</td>
+                  <td class="text-right">{{ venta.total | number:'1.0-2' }}</td>
+                  <td>{{ venta.retiroExcedente ? 'Sí' : '—' }}</td>
+                  <td>
+                    <button class="btn btn-primary btn-sm" type="button" [routerLink]="['/ventas', venta.id]">Ver detalle</button>
+                  </td>
+                  <td *ngIf="loginService.isAdmin()">
+                    <button class="btn btn-danger btn-sm" type="button" [disabled]="cliente.eliminado" (click)="delete(venta)">Eliminar</button>
+                  </td>
+                </tr>
+              </tbody>
             </table>
-            </div>
-            </div>
-            
+          </div>
         </div>
         <div class="modal-footer">
-          <button (click)="cerrarModal()" type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button (click)="cerrarModal()" type="button" class="btn btn-secondary">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-
-
 </div>

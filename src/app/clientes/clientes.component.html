@@ -1,60 +1,65 @@
 <detalle-cliente *ngIf="clienteSeleccionado" [cliente]="clienteSeleccionado"></detalle-cliente>
-<div class="card border-secondary mb-3">
-  <div class="card-header">Clientes</div>
-  <div class="card-body text-secondary">
-    <h5 class="card-title">Lista de Clientes:</h5>
-<div class="my-2 text-left">
-    <button class="btn btn-rounded btn-primary" type="button" [routerLink] = "['/clientes/form']">Crear cliente</button>
-</div>
-    <p>Transportes Paredes Ltda.</p>
 
-    <div class="table-hover table-responsive">
-      <div *ngIf="clientes?.length == 0" class="alert alert-info">
-        Lo siento, no existen registros en la base de datos!
-      </div>
-    <table class="table table-bordered table-striped" *ngIf="clientes?.length>0">
+<div class="app-card">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="section-title mb-1">Clientes</h2>
+      <p class="text-muted mb-0">Gestión de contactos y operaciones</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/clientes/form">Nuevo cliente</a>
+  </div>
+
+  <div class="table-responsive" *ngIf="clientes?.length > 0; else sinDatos">
+    <table class="table table-hover align-middle">
       <thead class="thead-light">
         <tr>
-          <th>id</th>
-          <th>nombre</th>
-          <th>ubicacion</th>
-          <th>email</th>
-          <th>telefono</th>
+          <th></th>
+          <th>Nombre</th>
+          <th>Ubicación</th>
+          <th>Email</th>
+          <th>Teléfono</th>
           <th>Estado</th>
-          <th>crear venta</th>
-          <th>editar</th>
-          <th>eliminar</th>
+          <th></th>
+          <th></th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let cliente of clientes ">
-          <td><img (click)="abrirModal(cliente)" *ngIf="cliente?.foto"
-             src="http://localhost:8080/api/uploads/img/{{cliente.foto}}" alt="{{cliente.foto}}" class="img-thumbnail rounded"
-             style="width:64px; height: 64px; cursor: pointer;">
-
-             <img (click)="abrirModal(cliente)" *ngIf="!cliente?.foto"
-             src="http://localhost:8080/images/usuario.png" alt="Sin foto" class="img-thumbnail rounded"
-             style="width:64px; height: 64px; cursor: pointer;">
+        <tr *ngFor="let cliente of clientes">
+          <td>
+            <img (click)="abrirModal(cliente)" [src]="fotoCliente(cliente)" [alt]="cliente.nombre"
+                 class="rounded cliente-thumb" role="button">
+          </td>
           <td>{{ cliente.nombre }}</td>
           <td>{{ cliente.ubicacion }}</td>
           <td>{{ cliente.email }}</td>
           <td>{{ cliente.telefono }}</td>
-
-          <td><span *ngIf="cliente.eliminado; else active">Elminado</span>
-            <ng-template #active>Activo</ng-template></td>
-
-            <td><button type="button" class="btn btn-success" [routerLink]="['/ventas/form', cliente.id]" [disabled]="cliente.eliminado==true">crear venta</button></td>
           <td>
-            <button type="button" name="button" [routerLink]="['/clientes/form', cliente.id]" [disabled]="cliente.eliminado==true" class="btn btn-primary">editar</button>
+            <span class="badge badge-pill" [ngClass]="cliente.eliminado ? 'badge-secondary' : 'badge-success'">
+              {{ cliente.eliminado ? 'Eliminado' : 'Activo' }}
+            </span>
           </td>
           <td>
-            <button class="btn btn-danger" role="button" (click)='delete(cliente)' [disabled]="cliente.eliminado==true">eliminar</button>
+            <a class="btn btn-sm btn-outline-success" [routerLink]="['/ventas/form', cliente.id]"
+               *ngIf="!cliente.eliminado">Venta</a>
+          </td>
+          <td>
+            <a class="btn btn-sm btn-outline-primary" [routerLink]="['/clientes/form', cliente.id]"
+               *ngIf="!cliente.eliminado">Editar</a>
+          </td>
+          <td>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="delete(cliente)"
+                    *ngIf="!cliente.eliminado">Eliminar</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <paginator-nav *ngIf="paginador" [paginador] = "paginador"></paginator-nav> 
+    <paginator-nav *ngIf="paginador" [paginador]="paginador"></paginator-nav>
   </div>
-</div>
 
+  <ng-template #sinDatos>
+    <div class="alert alert-info mb-0" *ngIf="clientes?.length === 0">
+      No hay clientes registrados. Cree el primero con «Nuevo cliente».
+    </div>
+  </ng-template>
 </div>

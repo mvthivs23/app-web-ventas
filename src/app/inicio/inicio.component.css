@@ -1,45 +1,8 @@
-.barra{
-width: 30%;
-}
-
-.content{
-    width: 70%;
-
-
-}
-
-.tarjeta{
-    height: 350px;
-    border-radius: 30px;
-    font-size: large;
-    background-image: url('src/app/imagenes/azul.jpg');
-    background-position: -100px -200px;
-    animation: backBanner 4s backwards;
-    
-
-}
-
-.titulo{
-    font-style: oblique;
-    text-align: center;
-}
-
-.tarjeta > h5{
-    font-size: 90px;
-}
-
-.card-text{
-    font-weight: bold;
-    font-style: oblique;
-    font-size: large;
-}
-
-@keyframes backBanner {
-    0%{
-        background-position: 0px 0px;
-    }
-    100%{
-        background-position: -200px -200px;
-
-    }
+.hero {
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(0, 86, 179, 0.9), rgba(30, 126, 52, 0.9)),
+    url('../imagenes/azul.jpg');
+  background-size: cover;
+  background-position: center;
 }

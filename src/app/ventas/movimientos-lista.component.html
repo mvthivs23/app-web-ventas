@@ -1,0 +1,72 @@
+<div class="app-card mov-lista-page">
+  <div class="d-flex flex-wrap justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="section-title mb-1">Compras y ventas</h2>
+      <p class="text-muted mb-0 small">Movimientos registrados (cada uno tiene un número identificador). Filtre por tipo de operación y fechas.</p>
+    </div>
+    <a routerLink="/compras-ventas/nueva" class="btn btn-primary btn-sm">Nueva compra / venta</a>
+  </div>
+
+  <div class="form-row align-items-end mb-3 filtros-mov">
+    <div class="form-group col-md-3 col-sm-6 mb-2 mb-md-0">
+      <label for="mv-desde">Desde</label>
+      <input id="mv-desde" type="date" class="form-control" [(ngModel)]="desde" name="desde" />
+    </div>
+    <div class="form-group col-md-3 col-sm-6 mb-2 mb-md-0">
+      <label for="mv-hasta">Hasta</label>
+      <input id="mv-hasta" type="date" class="form-control" [(ngModel)]="hasta" name="hasta" />
+    </div>
+    <div class="form-group col-md-3 col-sm-6 mb-2 mb-md-0">
+      <label for="mv-tipo">Tipo</label>
+      <select id="mv-tipo" class="form-control" [(ngModel)]="tipoFiltro" name="tipoFiltro">
+        <option value="TODOS">Todos</option>
+        <option value="INGRESO">Ventas (ingreso)</option>
+        <option value="EGRESO">Compras (egreso)</option>
+      </select>
+    </div>
+    <div class="form-group col-md-3 col-sm-6 mb-0">
+      <button type="button" class="btn btn-outline-primary btn-block" (click)="refrescar()" [disabled]="cargando">Aplicar</button>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="alert alert-info">Cargando movimientos…</div>
+
+  <div class="table-responsive" *ngIf="!cargando && movimientos.length">
+    <table class="table table-sm table-hover">
+      <thead class="thead-light">
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Cliente</th>
+          <th>Descripción</th>
+          <th class="text-right">Total</th>
+          <th>Retiro</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of movimientos">
+          <td><strong>#{{ v.id }}</strong></td>
+          <td>{{ v.createAt | date:'dd/MM/y':'':'es' }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="!esEgreso(v)" [class.badge-danger]="esEgreso(v)">
+              {{ esEgreso(v) ? 'Compra' : 'Venta' }}
+            </span>
+          </td>
+          <td>{{ v.cliente?.nombre || '—' }}</td>
+          <td>{{ v.descripcion || '—' }}</td>
+          <td class="text-right">{{ v.total | number:'1.0-2' }}</td>
+          <td>{{ v.retiroExcedente ? 'Sí' : '—' }}</td>
+          <td class="text-nowrap">
+            <a class="btn btn-link btn-sm py-0" [routerLink]="['/ventas', v.id]">Ver detalle</a>
+            <a *ngIf="loginService.isAdmin()" class="btn btn-link btn-sm py-0" [routerLink]="['/compras-ventas/editar', v.id]">Editar</a>
+            <button *ngIf="loginService.isAdmin()" type="button" class="btn btn-link btn-sm text-danger py-0" (click)="eliminar(v)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="text-muted mb-0" *ngIf="!cargando && !movimientos.length">No hay movimientos en el rango seleccionado.</p>
+</div>

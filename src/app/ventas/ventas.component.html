@@ -1,90 +1,106 @@
-<div class="card bg-ligth">
-    <div class="card-header">{{titulo}}: {{venta.descripcion}}</div>
-    <div class="card-body">
-        <h4>
-            <a [routerLink]="['/clientes']" class="btn btn-primary btn-xs">&laquo; volver</a>
-        </h4>
+<div class="app-card ventas-page">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0">{{ titulo }}</h2>
+    <div class="d-flex flex-wrap gap-2">
+      <a routerLink="/compras-ventas" class="btn btn-outline-secondary btn-sm">&laquo; Lista de movimientos</a>
+      <a routerLink="/clientes" class="btn btn-outline-secondary btn-sm" *ngIf="!modoClienteLibre && !modoEdicion">&laquo; Volver a clientes</a>
+      <a routerLink="/materiales" class="btn btn-outline-primary btn-sm">Materiales y precios</a>
+    </div>
+  </div>
 
-        <form #ventaForm="ngForm">
+  <form #ventaForm="ngForm">
+    <div class="form-group" *ngIf="modoClienteLibre && !modoEdicion">
+      <label>Cliente (persona o empresa)</label>
+      <input
+        type="text"
+        matInput
+        class="form-control"
+        [matAutocomplete]="autoCli"
+        [formControl]="clienteBusqueda"
+        placeholder="Escriba al menos 2 letras para buscar"
+        autocomplete="off"
+      />
+      <mat-autocomplete #autoCli="matAutocomplete" [displayWith]="mostrarCliente" (optionSelected)="seleccionarCliente($event)">
+        <mat-option *ngFor="let c of clientesFiltrados | async" [value]="c">{{ c.nombre }}</mat-option>
+      </mat-autocomplete>
+      <small class="text-muted">Debe existir en clientes; puede darlo de alta en Clientes si no aparece.</small>
+    </div>
 
-            <div class="form-group row" *ngIf="venta.cliente">
-                <label for="cliente" class="col-sm-2 col-form-label">Cliente</label>
-                <div class="col-sm-6">
-                    <input type="text" name="cliente" value="{{venta.cliente.nombre}}" 
-                    class="form-control" disabled>
-                </div>
-            </div>
+    <div class="form-group" *ngIf="!modoClienteLibre && venta.cliente">
+      <label>Cliente</label>
+      <input type="text" class="form-control" [value]="venta.cliente.nombre" disabled />
+    </div>
 
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="descripcion">Descripción</label>
+        <input id="descripcion" type="text" name="descripcion" class="form-control" [(ngModel)]="venta.descripcion" required #descripcion="ngModel" />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="tipo">Movimiento</label>
+        <select id="tipo" name="tipo" class="form-control" [(ngModel)]="venta.tipo" (ngModelChange)="onTipoChange()" [disabled]="modoRetiro">
+          <option value="INGRESO">Venta de material (cobra / ingreso)</option>
+          <option value="EGRESO">Compra de material (paga / egreso)</option>
+        </select>
+      </div>
+    </div>
 
-            <div class="form-group row">
-                <label for="" class="col-sm-2 col-form-label">Descripcion</label>
-                <div class="col-sm-6">
-                    <input type="text" name="descripcion" [(ngModel)]="venta.descripcion" class="form-control" required #descripcion="ngModel">
-                    <div class="alert alert-danger" *ngIf="descripcion.invalid && descripcion.touched"></div>
-                </div>
-            </div>
+    <div class="form-group">
+      <label for="obs">Observación</label>
+      <textarea id="obs" name="observacion" class="form-control" rows="2" [(ngModel)]="venta.observacion"></textarea>
+    </div>
 
-            <div class="form-group row">
-                <label for="" class="col-sm-2 col-form-label">Observacion</label>
-                <div class="col-sm-6">
-                    <textarea name="observacion" [(ngModel)]="venta.observacion" class="form-control"></textarea>
-                </div>
-            </div>
+    <div class="form-group custom-control custom-checkbox" *ngIf="venta.tipo === 'INGRESO' && !modoRetiro">
+      <input type="checkbox" class="custom-control-input" id="retiro" name="retiroExcedente" [(ngModel)]="venta.retiroExcedente" />
+      <label class="custom-control-label" for="retiro">Retiro de excedente (venta en volumen a distribuidor)</label>
+    </div>
+    <p class="text-muted small" *ngIf="modoRetiro">Este registro se guardará como retiro de excedente (ingreso a distribuidor).</p>
 
-            <div class="form-group row">
-                <div class="col-sm-6">
-            <mat-form-field class="example-full-width" appearance="fill">
-                <mat-label>Producto</mat-label>
-                <input type="text"
-                       placeholder="Añadir producto"
-                       aria-label="Number"
-                       matInput
-                       [formControl]="autoCompleteControl"
-                       [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="mostrarNombre" (optionSelected)="seleccionarProducto($event)">
-                  <mat-option *ngFor="let producto of productosFiltrados | async" [value]="producto">
-                    {{producto.nombre}}
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-              </div>
-              </div>
+    <div class="form-group">
+      <mat-form-field class="w-100" appearance="outline">
+        <mat-label>Agregar material</mat-label>
+        <input type="text" matInput [formControl]="autoCompleteControl" [matAutocomplete]="autoProd" placeholder="Buscar por nombre" />
+        <mat-autocomplete #autoProd="matAutocomplete" [displayWith]="mostrarNombre" (optionSelected)="seleccionarProducto($event)">
+          <mat-option *ngFor="let producto of productosFiltrados | async" [value]="producto">{{ producto.nombre }} — ${{ producto.precio }}/kg</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
 
-              <div class="alert alert-info my-4" *ngIf="venta.items.length==0">
-             No hay lineas asignadas para la venta. Debe agregar al menos una!
-            </div>
+    <div class="alert alert-info" *ngIf="venta.items.length === 0">Agregue al menos un material y los kilogramos.</div>
 
-              <table class="table table-striped table-hover table-sm" *ngIf="venta.items.length>0">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Precio</th>
-                        <th>Kilogramos</th>
-                        <th>Total</th>
-                        <th>Eliminar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let item of venta.items">
-                        <td>{{item.producto.nombre}}</td>
-                        <td>{{item.producto.precio}}</td>
-                        <td><input type="number" value="{{item.cantidad}}" class="form-control col-sm-4" (change)="actualizarCantidad(item.producto.id, $event)"></td>
-                        <td>{{item.calcularImporte()}}</td>
-                        <td><button class="btn btn-danger btn-sm" type="button"
-                            (click)="eliminarItemVenta(item.producto.id)">x</button></td>
-                    </tr>
-                </tbody>
-              </table>
+    <div class="table-responsive" *ngIf="venta.items.length > 0">
+      <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>$/kg</th>
+            <th>Kilos</th>
+            <th>Importe</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of venta.items">
+            <td>{{ item.producto.nombre }}</td>
+            <td>{{ item.producto.precio | number:'1.0-2' }}</td>
+            <td style="max-width: 140px">
+              <input type="number" class="form-control form-control-sm" min="0.01" step="0.01" [value]="item.cantidad" (change)="actualizarCantidad(item.producto.id, $event)" />
+            </td>
+            <td>{{ item.calcularImporte() | number:'1.0-2' }}</td>
+            <td>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="eliminarItemVenta(item.producto.id)">Quitar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-              <h2 class="float-right" *ngIf="venta.items.length>0">Total venta:  <span class="badge badge-secondary">{{venta.calcularGranTotal()}}</span></h2>
+    <h4 class="text-right mb-3" *ngIf="venta.items.length > 0">
+      Total: <span class="badge badge-primary">{{ venta.calcularGranTotal() | number:'1.0-2' }}</span>
+    </h4>
 
-            <div class="form-group row">
-                <div class="col-sm-6">
-                    <input type="submit" (click)="create()" value="Crear Venta" class="btn btn-secondary" [disabled]="ventaForm.form.invalid || venta.items.length == 0">
-                </div>
-            </div>
-
-        </form>
-
-        </div>
-        </div>
+    <button type="button" class="btn btn-primary" (click)="create()" [disabled]="ventaForm.form.invalid || venta.items.length === 0 || !venta.cliente?.id">
+      {{ modoEdicion ? 'Guardar cambios' : 'Guardar movimiento' }}
+    </button>
+  </form>
+</div>

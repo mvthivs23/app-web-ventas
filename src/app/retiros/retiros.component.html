@@ -1,38 +1,65 @@
-<div class="card border-secondary mb-3">
-    <div class="card-header">Retiros de excedente</div>
-    <div class="card-body text-secondary">
-      <h5 class="card-title">Lista de Retiros excedente:</h5>
-      <p>Transportes Paredes Ltda.</p>
-  
-      <div class="table-hover table-responsive">
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th>id</th>
-              <th>Fecha</th>
-              <th>Descripcion</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let retiro of retiros">
-              <td>{{ retiro.id }}</td>
-              <td>{{ retiro.createAt }}</td>
-              <td>{{ retiro.descripcion }}</td>
-            </tr>
-          </tbody>
-        </table>
+<div class="app-card">
+  <div class="d-flex flex-wrap justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="section-title mb-1">Retiros de excedente</h2>
+      <p class="text-muted mb-0">
+        Ventas en volumen a distribuidores u otras grandes empresas. Se registran como movimiento de ingreso con la marca de retiro.
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-secondary btn-sm mr-2" routerLink="/compras-ventas">Lista movimientos</a>
+      <a class="btn btn-primary btn-sm" routerLink="/compras-ventas/nueva" [queryParams]="{ retiro: 1 }">Registrar retiro</a>
+      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="refrescar()" [disabled]="cargando">Actualizar</button>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="alert alert-info">Cargando historial…</div>
+
+  <div class="table-responsive" *ngIf="!cargando && retiros?.length; else sinRetiros">
+    <table class="table table-hover table-sm">
+      <thead class="thead-light">
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Descripción</th>
+          <th class="text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of paginaItems">
+          <td>{{ v.id }}</td>
+          <td>{{ v.createAt | date:'dd/MM/y':'':'es' }}</td>
+          <td>{{ v.cliente?.nombre || '—' }}</td>
+          <td>{{ v.descripcion }}</td>
+          <td class="text-right">{{ v.total | number:'1.0-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <nav class="retiros-pag mt-3" *ngIf="totalPaginas > 1" aria-label="Paginación de retiros">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="irPagina(-1)" [disabled]="paginaActual === 0">Anterior</button>
+        <span class="text-muted small">Página {{ paginaActual + 1 }} de {{ totalPaginas }}</span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="irPagina(1)" [disabled]="paginaActual >= totalPaginas - 1">Siguiente</button>
       </div>
-    </div>
-    <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-      </ul>
+      <div class="d-flex flex-wrap justify-content-center mt-2">
+        <button
+          type="button"
+          *ngFor="let idx of indicesPagina"
+          class="btn btn-sm retiros-pag__num"
+          [class.btn-primary]="paginaActual === idx"
+          [class.btn-outline-secondary]="paginaActual !== idx"
+          (click)="irAPagina(idx)">
+          {{ idx + 1 }}
+        </button>
+      </div>
     </nav>
+  </div>
+
+  <ng-template #sinRetiros>
+    <div class="alert alert-secondary mb-0" *ngIf="!cargando">
+      No hay retiros registrados. Use <strong>Registrar retiro</strong> y elija un cliente ya dado de alta.
     </div>
-    
-    
-  
+  </ng-template>
+</div>

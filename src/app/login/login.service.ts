@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import baserUrl from './helper'
+import { apiUrl } from '../core/api-url';
 
 @Injectable({
   providedIn: 'root'
@@ -10,61 +10,80 @@ export class LoginService {
 
   public loginStatusSubjec = new Subject<boolean>();
 
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  //generamos el token
-  public generateToken(loginData:any){
-    return this.http.post(`${baserUrl}/generate-token`,loginData);
+  public generateToken(loginData: { username: string; password: string }) {
+    return this.http.post(apiUrl('/generate-token'), loginData);
   }
 
-  public getCurrentUser(){
-    return this.http.get(`${baserUrl}/actual-usuario`);
+  public getCurrentUser() {
+    return this.http.get(apiUrl('/actual-usuario'));
   }
 
-  //iniciamos sesión y establecemos el token en el localStorage
-  public loginUser(token:any){
-    localStorage.setItem('token',token);
+  public loginUser(token: string) {
+    localStorage.setItem('token', token);
+    this.loginStatusSubjec.next(true);
     return true;
   }
 
-  public isLoggedIn(){
-    let tokenStr = localStorage.getItem('token');
-    if(tokenStr == undefined || tokenStr == '' || tokenStr == null){
-      return false;
-    }else{
-      return true;
-    }
+  public isLoggedIn(): boolean {
+    const tokenStr = localStorage.getItem('token');
+    return !(tokenStr == undefined || tokenStr === '' || tokenStr == null);
   }
 
-  //cerranis sesion y eliminamos el token del localStorage
-  public logout(){
+  public logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    this.loginStatusSubjec.next(false);
     return true;
   }
 
-  //obtenemos el token
-  public getToken(){
+  public getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  public setUser(user:any){
+  public setUser(user: unknown) {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
-  public getUser(){
-    let userStr = localStorage.getItem('user');
-    if(userStr != null){
+  /**
+   * Lee el usuario persistido. No debe tener efectos secundarios: antes se llamaba a logout()
+   * cuando faltaba "user", lo que borraba el token en cada ciclo de detección del header.
+   */
+  public getUser(): any {
+    const userStr = localStorage.getItem('user');
+    if (userStr == null || userStr === '') {
+      return null;
+    }
+    try {
       return JSON.parse(userStr);
-    }else{
-      this.logout();
+    } catch {
       return null;
     }
   }
 
-  public getUserRole(){
-    let user = this.getUser();
-    return user.authorities[0].authority;
+  public getUserRole(): string | null {
+    const user = this.getUser();
+    if (!user) {
+      return null;
+    }
+    if (user.authorities && user.authorities.length) {
+      const a = user.authorities[0];
+      const auth = typeof a === 'string' ? a : a?.authority;
+      if (auth) {
+        return auth;
+      }
+    }
+    if (user.usuarioRoles && user.usuarioRoles.length) {
+      const ur = user.usuarioRoles[0];
+      if (ur?.rol?.nombre) {
+        return 'ROLE_' + ur.rol.nombre;
+      }
+    }
+    return 'ROLE_USER';
   }
 
+  isAdmin(): boolean {
+    return this.getUserRole() === 'ROLE_ADMIN';
+  }
 }

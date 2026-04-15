@@ -1,0 +1,21 @@
+.form-shell {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.form-shell__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-shell__title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.form-actions {
+  margin-top: 1.5rem;
+}

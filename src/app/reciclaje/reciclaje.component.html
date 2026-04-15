@@ -1,0 +1,90 @@
+<div class="reciclaje-page">
+  <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+    <div>
+      <h2 class="section-title mb-1">Reciclaje del mes</h2>
+      <p class="text-muted mb-0">Volumen por material según ventas registradas y estimación de impacto ambiental.</p>
+    </div>
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="cargar()" [disabled]="cargando">
+      Actualizar
+    </button>
+  </div>
+
+  <p class="reciclaje-disclaimer small text-muted mb-3">
+    Las cifras de impacto (CO₂e, energía, árboles) son <strong>estimaciones orientativas</strong> a partir de factores
+    bibliográficos típicos; no sustituyen un estudio de huella de carbono certificado.
+  </p>
+
+  <div *ngIf="cargando" class="app-card mb-3">
+    <div class="text-muted">Cargando datos de reciclaje…</div>
+  </div>
+
+  <div class="row mb-3" *ngIf="!cargando && !sinDatos">
+    <div class="col-md-4 mb-2">
+      <div class="impact-card impact-card--volume">
+        <small>Periodo</small>
+        <h4 class="text-capitalize">{{ mesEtiqueta }}</h4>
+        <span class="impact-card__hint">Suma de cantidades en líneas de venta</span>
+      </div>
+    </div>
+    <div class="col-md-4 mb-2">
+      <div class="impact-card impact-card--mass">
+        <small>Total operado</small>
+        <h4>{{ totalCantidad | number:'1.0-2' }}</h4>
+        <span class="impact-card__hint">Unidades según registro (p. ej. kg)</span>
+      </div>
+    </div>
+    <div class="col-md-4 mb-2">
+      <div class="impact-card impact-card--co2">
+        <small>CO₂e evitado (estim.)</small>
+        <h4>{{ totalCo2e | number:'1.0-1' }} kg</h4>
+        <span class="impact-card__hint">Equivalente de emisiones evitadas</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-3" *ngIf="!cargando && !sinDatos">
+    <div class="col-md-6 mb-2">
+      <div class="app-card h-100 impact-secondary">
+        <h3 class="h6 font-weight-bold text-uppercase text-muted mb-2">Energía no consumida (aprox.)</h3>
+        <p class="display-4 mb-0">{{ energiaEstimadaKwh | number:'1.0-0' }}</p>
+        <p class="text-muted small mb-0">kWh equivalentes si esa energía hubiera sido generada con un mix eléctrico típico.</p>
+      </div>
+    </div>
+    <div class="col-md-6 mb-2">
+      <div class="app-card h-100 impact-secondary">
+        <h3 class="h6 font-weight-bold text-uppercase text-muted mb-2">Comparativo arbóreo (aprox.)</h3>
+        <p class="display-4 mb-0">{{ equivalenteArboles | number:'1.1-1' }}</p>
+        <p class="text-muted small mb-0">Árboles que, en un año, absorberían un CO₂ similar al evitado (modelo simplificado).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-card" *ngIf="!cargando && !sinDatos">
+    <h3 class="h5 font-weight-bold mb-3">Desglose por material</h3>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="thead-light">
+          <tr>
+            <th>Material</th>
+            <th class="text-right">Cantidad</th>
+            <th class="text-right">CO₂e evitado (kg)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filasMes">
+            <td>{{ row.material }}</td>
+            <td class="text-right">{{ row.cantidad | number:'1.0-2' }}</td>
+            <td class="text-right">{{ row.co2e | number:'1.0-1' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="app-card" *ngIf="!cargando && sinDatos">
+    <div class="empty-state text-center py-4">
+      <p class="mb-2 font-weight-bold">No hay movimientos de reciclaje registrados para este mes.</p>
+      <p class="text-muted small mb-0">Registre ventas con ítems y productos para alimentar este panel. También puede revisar el histórico en <a routerLink="/reportes">Reportes</a>.</p>
+    </div>
+  </div>
+</div>

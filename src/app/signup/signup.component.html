@@ -1,55 +1,72 @@
+<div class="auth-layout">
+  <div class="auth-card signup-card">
+    <div class="signup-badge">EcoRecicla</div>
+    <h1 class="auth-brand">Crear cuenta</h1>
+    <p class="auth-sub">Solo necesita un usuario, una contraseña segura y el tipo de acceso.</p>
 
+    <form (ngSubmit)="formSubmit()" #f="ngForm" class="signup-form auth-form">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Usuario</mat-label>
+        <input
+          matInput
+          name="username"
+          [(ngModel)]="modelo.username"
+          required
+          minlength="3"
+          maxlength="50"
+          pattern="^[a-zA-Z0-9._-]+$"
+          autocomplete="username"
+          [disabled]="enviando"
+          placeholder="ej. maria.garcia"
+        />
+        <mat-hint>3–50 caracteres: letras, números, . _ -</mat-hint>
+      </mat-form-field>
 
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          type="password"
+          name="password"
+          [(ngModel)]="modelo.password"
+          required
+          minlength="6"
+          autocomplete="new-password"
+          [disabled]="enviando"
+        />
+        <mat-hint>Mínimo 6 caracteres</mat-hint>
+      </mat-form-field>
 
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Tipo de rol</mat-label>
+        <mat-select name="rol" [(ngModel)]="modelo.rol" required [disabled]="enviando">
+          <mat-option *ngFor="let r of rolOpciones" [value]="r.valor">
+            {{ r.etiqueta }} — {{ r.descripcion }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-<section class="vh-100">
-  <div class="container-fluid h-custom">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-md-9 col-lg-6 col-xl-5">
-        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-          class="img-fluid" alt="Sample image">
-      </div>
-      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+      <p class="signup-hint-admin text-muted small mb-3">
+        Use <strong>Administrador</strong> solo para cuentas de confianza.
+      </p>
 
-        <h2>Bienvenido</h2>
-        <form (ngSubmit) = "formSubmit()">
-          <mat-form-field class="full-width" style = "margin-left: 10px; margin-top: 20px;"  appearance = "outline">
-            <mat-label>Nombre de usuario</mat-label>
-            <input required [(ngModel)] = "user.username" name = "username" matInput placeholder="Digite su nombre de usuario">
-          </mat-form-field>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        class="auth-submit w-100"
+        [disabled]="!f.form.valid || enviando"
+      >
+        <span *ngIf="!enviando">Crear cuenta</span>
+        <span *ngIf="enviando" class="d-inline-flex align-items-center justify-content-center">
+          <mat-progress-spinner diameter="22" mode="indeterminate" class="auth-spinner"></mat-progress-spinner>
+          <span class="ml-2">Creando cuenta…</span>
+        </span>
+      </button>
+    </form>
 
-          <mat-form-field class="full-width" style = "margin-left: 10px; margin-top: 20px;" appearance = "outline">
-            <mat-label>Contraseña</mat-label>
-            <input required [(ngModel)] = "user.password" name = "password" type = "password" matInput placeholder="Digite su contraseña">
-          </mat-form-field>
-
-          <mat-form-field class="full-width" style = "margin-left: 10px; margin-top: 20px;" appearance = "outline">
-            <mat-label>Nombre</mat-label>
-            <input required [(ngModel)] = "user.nombre" name = "nombre" matInput placeholder="Digite su nombre">
-          </mat-form-field>
-
-          <mat-form-field class="full-width" style = "margin-left: 10px; margin-top: 20px;" appearance = "outline">
-            <mat-label>Apellido</mat-label>
-            <input required [(ngModel)] = "user.apellido" name = "apellido" matInput placeholder="Digite su apellido">
-          </mat-form-field>
-
-          <mat-form-field class="full-width" style = "margin-left: 10px; margin-top: 20px;" appearance = "outline">
-            <mat-label>Email</mat-label>
-            <input required [(ngModel)] = "user.email" name = "email" type="email" matInput placeholder="Digite su email">
-          </mat-form-field>
-
-          <mat-form-field class="full-width" style = "margin-left: 10px; margin-top: 20px;" appearance = "outline">
-            <mat-label>Telefono</mat-label>
-            <input required [(ngModel)] = "user.telefono" name = "telefono" matInput placeholder="Digite su telefono">
-          </mat-form-field>
-
-          <div class = "container text-center">
-            <button mat-raised-button color="primary">Registrar</button>
-            <button type="reset" style = "margin-left: 20px;" mat-raised-button color="accent">Limpiar</button>
-          </div>
-        </form>
-        <br><br><br>
-      </div>
-    </div>
+    <p class="auth-footer text-center mt-3 mb-0">
+      ¿Ya tiene cuenta? <a routerLink="/login">Iniciar sesión</a>
+    </p>
   </div>
-</section>
+</div>

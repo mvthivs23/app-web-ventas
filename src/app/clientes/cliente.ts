@@ -11,6 +11,6 @@ export class Cliente {
     comuna: Comuna;
     foto: string;
     ventas: Array<Venta> = [];
-  
+    eliminado?: boolean;
     }
 

@@ -1,85 +1,59 @@
+<div class="app-card form-shell">
+  <div class="form-shell__header">
+    <a [routerLink]="['/clientes']" class="btn btn-outline-secondary btn-sm">&laquo; Volver</a>
+    <h2 class="form-shell__title">{{ titulo }}</h2>
+  </div>
 
-<div class="card bg-secondary text-white">
-    <div class="card-body">
-        <h4>
-            <a [routerLink]="['/clientes']" class="btn btn-primary btn-xs">&laquo; volver</a>
-        </h4>
-    <div class="card-header">{{titulo}}</div>
-    <div class="card-body">
-    
-        <form #clienteForm="ngForm">
-    <div class="form-group row">
-        <label for="nombre" class="col-form-label col-sm-2">Nombre</label>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" [(ngModel)]="cliente.nombre" name="nombre" required minlength="4" #nombre="ngModel">
-            <div class="alert alert-danger" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">
-                <div *ngIf="nombre.errors.required">
-    El nombre es requerido!!
-                </div>
-                <div *ngIf="nombre.errors.minlength">
-    El nombre debe tener al menos 4 caracteres
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="form-group row">
-        <label for="ubicacion" class="col-form-label col-sm-2">Ubicacion</label>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" [(ngModel)]="cliente.ubicacion" name="ubicacion" required #ubicacion="ngModel">
-            <div class="alert alert-danger" *ngIf="ubicacion.invalid && (ubicacion.dirty || ubicacion.touched)">
-                <div *ngIf="ubicacion.errors.required">
-    La ubicacion es requerida!!
-                </div>
-        </div>
-    </div>
-    </div>
-    <div class="form-group row">
-        <label for="email" class="col-form-label col-sm-2">Email</label>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" [(ngModel)]="cliente.email" name="email" required email #email="ngModel">
-            <div class="alert alert-danger" *ngIf="email.invalid && (email.dirty || email.touched)">
-                <div *ngIf="email.errors.required">
-    El email es requerido!!
-                </div>
-                <div *ngIf="email.errors.email">
-                    El email debe tener un formato valido!!
-                                </div>
-        </div>
-    </div>
-    </div>
-        
-    
-    <div class="form-group row">
-        <label for="telefono" class="col-form-label col-sm-2">Telefono</label>
-        <div class="col-sm-6">
-            <input type="text" class="form-control" [(ngModel)]="cliente.telefono" name="telefono" required minlength="9" #telefono="ngModel">
-            <div class="alert alert-danger" *ngIf="telefono.invalid && (telefono.dirty || telefono.touched)">
-                <div *ngIf="telefono.errors.required">
-    El telefono es requerido!!
-                </div>
-                <div *ngIf="telefono.errors.minlength">
-                    El telefono debe tener al menos 9 caracteres
-                                </div>
-        </div>
-    </div>
+  <form #clienteForm="ngForm" novalidate>
+    <div class="form-group">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" type="text" class="form-control" [(ngModel)]="cliente.nombre" name="nombre"
+             required minlength="4" maxlength="30" #nombre="ngModel" autocomplete="organization">
+      <div class="invalid-feedback d-block" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">
+        <span *ngIf="nombre.errors?.required">El nombre es obligatorio.</span>
+        <span *ngIf="nombre.errors?.minlength">Mínimo 4 caracteres.</span>
+        <span *ngIf="nombre.errors?.maxlength">Máximo 30 caracteres (requisito del sistema).</span>
+      </div>
     </div>
 
-    
-    
-    <div class="form-group row">
-        <div class="col-sm-6">
-            <button class="btn btn-primary" role="button" (click)='create()' *ngIf="!cliente.id else elseBlock" [disabled]="!clienteForm.form.valid">Crear cliente</button>
-            <button class="btn btn-primary" type="reset" style = "margin-left: 20px;">Limpiar</button>
-    
-            <ng-template #elseBlock>
-                <button class="btn btn-primary" role="button" (click)='update()' [disabled]="!clienteForm.form.valid">Editar</button>
-    
-            </ng-template>
-        </div>
+    <div class="form-group">
+      <label for="ubicacion">Ubicación</label>
+      <input id="ubicacion" type="text" class="form-control" [(ngModel)]="cliente.ubicacion" name="ubicacion"
+             required minlength="10" maxlength="50" #ubicacion="ngModel" autocomplete="street-address">
+      <div class="invalid-feedback d-block" *ngIf="ubicacion.invalid && (ubicacion.dirty || ubicacion.touched)">
+        <span *ngIf="ubicacion.errors?.required">La ubicación es obligatoria.</span>
+        <span *ngIf="ubicacion.errors?.minlength">Mínimo 10 caracteres (dirección o referencia completa).</span>
+        <span *ngIf="ubicacion.errors?.maxlength">Máximo 50 caracteres.</span>
+      </div>
     </div>
-    
-    </form>
-    
+
+    <div class="form-group">
+      <label for="email">Correo</label>
+      <input id="email" type="email" class="form-control" [(ngModel)]="cliente.email" name="email"
+             required email #email="ngModel" autocomplete="email">
+      <div class="invalid-feedback d-block" *ngIf="email.invalid && (email.dirty || email.touched)">
+        <span *ngIf="email.errors?.required">El correo es obligatorio.</span>
+        <span *ngIf="email.errors?.email">Formato de correo no válido.</span>
+      </div>
     </div>
+
+    <div class="form-group">
+      <label for="telefono">Teléfono</label>
+      <input id="telefono" type="text" class="form-control" [(ngModel)]="cliente.telefono" name="telefono"
+             required minlength="9" maxlength="11" #telefono="ngModel" autocomplete="tel">
+      <div class="invalid-feedback d-block" *ngIf="telefono.invalid && (telefono.dirty || telefono.touched)">
+        <span *ngIf="telefono.errors?.required">El teléfono es obligatorio.</span>
+        <span *ngIf="telefono.errors?.minlength">Mínimo 9 caracteres.</span>
+        <span *ngIf="telefono.errors?.maxlength">Máximo 11 caracteres (requisito del sistema).</span>
+      </div>
     </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary" *ngIf="!cliente.id" (click)="create()"
+              [disabled]="!clienteForm.form.valid">Guardar cliente</button>
+      <button type="button" class="btn btn-primary" *ngIf="cliente.id" (click)="update()"
+              [disabled]="!clienteForm.form.valid">Actualizar cliente</button>
+      <button type="reset" class="btn btn-outline-secondary ml-2">Limpiar</button>
+    </div>
+  </form>
+</div>

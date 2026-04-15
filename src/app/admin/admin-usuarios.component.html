@@ -1,0 +1,64 @@
+<div class="app-card admin-users-page">
+  <h2 class="section-title">Administración de usuarios</h2>
+  <p class="text-muted">Solo el rol administrador puede crear usuarios y gestionar el acceso. Usuario por defecto: <code>admin</code> / <code>admin123</code> (cambie la contraseña tras el primer acceso).</p>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h3 class="h6 font-weight-bold mb-3">Nuevo usuario</h3>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Usuario</label>
+          <input class="form-control" [(ngModel)]="nuevo.username" name="nuUser" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Contraseña</label>
+          <input type="password" class="form-control" [(ngModel)]="nuevo.password" name="nuPass" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Rol</label>
+          <select class="form-control" [(ngModel)]="nuevo.rol" name="nuRol">
+            <option value="NORMAL">Operativo</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+        </div>
+        <div class="form-group col-md-2 d-flex align-items-end">
+          <button type="button" class="btn btn-primary btn-block" (click)="crear()">Crear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="alert alert-info">Cargando…</div>
+
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-sm table-hover">
+      <thead class="thead-light">
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Activo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of usuarios">
+          <td>{{ u.id }}</td>
+          <td>{{ u.username }}</td>
+          <td>
+            <select class="form-control form-control-sm" [value]="u.rol || 'NORMAL'" (change)="cambiarRol(u, $any($event.target).value)" name="rol{{ u.id }}">
+              <option value="NORMAL">NORMAL</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+          </td>
+          <td>
+            <button type="button" class="btn btn-sm" [class.btn-outline-secondary]="u.enabled" [class.btn-secondary]="!u.enabled" (click)="toggleEnabled(u)">
+              {{ u.enabled ? 'Activo' : 'Inactivo' }}
+            </button>
+          </td>
+          <td class="text-muted small">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

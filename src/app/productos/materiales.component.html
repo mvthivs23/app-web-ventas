@@ -1,0 +1,60 @@
+<div class="app-card materiales-page">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0">Materiales y precios</h2>
+    <a routerLink="/compras-ventas" class="btn btn-outline-secondary btn-sm mr-2">Lista movimientos</a>
+    <a routerLink="/compras-ventas/nueva" class="btn btn-outline-primary btn-sm">Registrar compra / venta</a>
+  </div>
+  <p class="text-muted">
+    Defina el valor por kilogramo de cada material. Al registrar una venta o compra, al elegir el material se usará este precio multiplicado por los kilos.
+    <ng-container *ngIf="loginService.isAdmin()"> La eliminación de un material solo está disponible para administradores y si no hay movimientos que lo referencien.</ng-container>
+  </p>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h3 class="h6 font-weight-bold mb-3">Agregar material</h3>
+      <div class="form-row align-items-end">
+        <div class="form-group col-md-6 mb-md-0">
+          <label for="mat-nombre">Nombre</label>
+          <input id="mat-nombre" class="form-control" [(ngModel)]="nuevoNombre" name="nuevoNombre" placeholder="Ej. Aluminio" />
+        </div>
+        <div class="form-group col-md-4 mb-md-0">
+          <label for="mat-precio">Precio $/kg</label>
+          <input id="mat-precio" type="number" class="form-control" min="0" step="0.01" [(ngModel)]="nuevoPrecio" name="nuevoPrecio" />
+        </div>
+        <div class="form-group col-md-2 mb-0">
+          <button type="button" class="btn btn-primary btn-block" (click)="agregar()" [disabled]="guardando">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="alert alert-info">Cargando…</div>
+
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-sm table-hover">
+      <thead class="thead-light">
+        <tr>
+          <th>ID</th>
+          <th>Material</th>
+          <th style="max-width: 160px">$/kg</th>
+          <th *ngIf="loginService.isAdmin()"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of materiales">
+          <td>{{ p.id }}</td>
+          <td>
+            <input class="form-control form-control-sm" [value]="p.nombre" (change)="actualizarNombre(p, $event)" />
+          </td>
+          <td>
+            <input type="number" class="form-control form-control-sm" min="0" step="0.01" [value]="p.precio" (change)="actualizarPrecio(p, $event)" />
+          </td>
+          <td *ngIf="loginService.isAdmin()">
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="eliminar(p)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="text-muted small mb-0" *ngIf="!materiales.length">No hay materiales. Agregue el primero arriba.</p>
+  </div>
+</div>

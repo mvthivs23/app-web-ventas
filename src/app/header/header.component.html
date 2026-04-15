@@ -1,47 +1,53 @@
-<header class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="titulo">
-    <a class="navbar-brand" routerLink="/inicio">{{title}}</a>
-    </div>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-  
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item" routerLinkActive="active">
-          <a class="nav-link" routerLink="/inicio">Inicio</a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a class="nav-link" routerLink="/clientes">Nuestros Clientes</a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a class="nav-link" routerLink="/retiros">Retiros de excedente</a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a class="nav-link" routerLink="/login">Iniciar sesión</a>
-        </li>
-        <li class="nav-item" routerLinkActive="active">
-          <a class="nav-link" routerLink="/signup">Registrarse</a>
-        </li>
-       
-        
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-        </li>
+<header class="app-navbar navbar navbar-expand-lg navbar-dark">
+  <a class="navbar-brand font-weight-bold" routerLink="/inicio">{{ title }}</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navMain"
+          aria-controls="navMain" aria-expanded="false" aria-label="Menú">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-        <li class="nav-item dropdown">
-          
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" routerLink="/inicio">Inicio</a>
-            <a class="dropdown-item" routerLink="/clientes">Clientes</a>
-          </div>
-        </li>
-      </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
-      
-    </div>
-    
-    </header>
+  <div class="collapse navbar-collapse" id="navMain">
+    <ul class="navbar-nav mr-auto" *ngIf="loginService.isLoggedIn()">
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/inicio">Inicio</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/clientes">Clientes</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/compras-ventas">Compras / ventas</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/materiales">Materiales</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/retiros">Retiros</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/reciclaje">Reciclaje</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" routerLink="/reportes">Reportes</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active" *ngIf="loginService.isAdmin()">
+        <a class="nav-link" routerLink="/admin/usuarios">Usuarios</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active" *ngIf="loginService.isAdmin()">
+        <a class="nav-link" routerLink="/signup">Alta usuario</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto align-items-lg-center">
+      <li class="nav-item mr-lg-3" *ngIf="loginService.isLoggedIn()">
+        <span class="navbar-text small text-white-50">{{ nombreUsuario() }}</span>
+      </li>
+      <li class="nav-item" *ngIf="!loginService.isLoggedIn()">
+        <a class="nav-link" routerLink="/login">Iniciar sesión</a>
+      </li>
+      <li class="nav-item" *ngIf="!loginService.isLoggedIn()">
+        <a class="nav-link" routerLink="/signup">Registrarse</a>
+      </li>
+      <li class="nav-item" *ngIf="loginService.isLoggedIn()">
+        <button type="button" class="btn btn-sm btn-outline-light ml-lg-2" (click)="salir()">Salir</button>
+      </li>
+    </ul>
+  </div>
+</header>

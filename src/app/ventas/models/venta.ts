@@ -5,6 +5,9 @@ export class Venta {
     id: number;
     descripcion: string;
     observacion: string;
+    tipo: string = 'INGRESO';
+    /** Retiro de excedente (venta en volumen a distribuidor). */
+    retiroExcedente = false;
     items: Array<ItemVenta>=[];
     cliente: Cliente;
     total: number;

@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
-import { RETIROS } from './retiros.json';
-import { Retiro } from './retiro';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { of } from 'rxjs';
+import { apiUrl } from '../core/api-url';
+import { Venta } from '../ventas/models/venta';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class RetiroService {
+  constructor(private http: HttpClient) {}
 
-  constructor() { }
-
-  getRetiros(): Observable<Retiro[]>{
-    return of (RETIROS);
+  getRetiros(): Observable<Venta[]> {
+    return this.http.get<Venta[]>(apiUrl('/api/ventas/retiros'));
   }
 }

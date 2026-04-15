@@ -1,0 +1,202 @@
+<div class="reportes-page">
+  <header class="report-doc-header">
+    <div class="report-doc-header__titles">
+      <span class="report-doc-badge">Reporte operativo</span>
+      <h1 class="report-doc-title">Centro de reportes</h1>
+      <p class="report-doc-sub">
+        Resumen financiero por rango de fechas y consolidado de material reciclado según ventas registradas.
+      </p>
+    </div>
+  </header>
+
+  <section class="report-section app-card" aria-labelledby="financiero-heading">
+    <div class="report-section__head">
+      <div>
+        <h2 id="financiero-heading" class="report-section__title">Estado de resultados simplificado</h2>
+        <p class="report-section__meta" *ngIf="desde && hasta">
+          Periodo analizado:
+          <strong>{{ fechaDesdeYmd(desde) | date:'d MMM y':'':'es' }}</strong>
+          —
+          <strong>{{ fechaDesdeYmd(hasta) | date:'d MMM y':'':'es' }}</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="report-filters">
+      <div class="report-filters__field">
+        <label for="rep-desde">Desde</label>
+        <input id="rep-desde" type="date" class="form-control" [(ngModel)]="desde" name="desde">
+      </div>
+      <div class="report-filters__field">
+        <label for="rep-hasta">Hasta</label>
+        <input id="rep-hasta" type="date" class="form-control" [(ngModel)]="hasta" name="hasta">
+      </div>
+      <div class="report-filters__actions">
+        <button type="button" class="btn btn-primary" (click)="buscarReporte()">Generar reporte</button>
+        <div class="report-pdf-row">
+          <label class="small text-muted mb-0 mr-2" for="pdf-tipo">PDF:</label>
+          <select id="pdf-tipo" class="form-control form-control-sm d-inline-block w-auto" [(ngModel)]="tipoReportePdf" name="tipoReportePdf">
+            <option value="TODOS">Todos</option>
+            <option value="INGRESO">Solo ventas</option>
+            <option value="EGRESO">Solo compras</option>
+          </select>
+          <button type="button" class="btn btn-outline-danger btn-sm ml-2" (click)="descargarPdfReporte()">Descargar PDF</button>
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="descargarCsvMovimientos()" [disabled]="!ventasDetalle?.length">
+          Descargar CSV
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="cargando" class="report-loading">Generando datos del periodo…</div>
+
+    <div class="report-kpi-grid" *ngIf="!cargando && reporte">
+      <article class="report-kpi report-kpi--ingreso">
+        <span class="report-kpi__label">Total ingresos</span>
+        <span class="report-kpi__value">${{ reporte.totalIngresos | number:'1.0-0' }}</span>
+        <span class="report-kpi__hint">Ventas tipo ingreso</span>
+      </article>
+      <article class="report-kpi report-kpi--egreso">
+        <span class="report-kpi__label">Total egresos</span>
+        <span class="report-kpi__value">${{ reporte.totalEgresos | number:'1.0-0' }}</span>
+        <span class="report-kpi__hint">Salidas / compras</span>
+      </article>
+      <article class="report-kpi report-kpi--balance">
+        <span class="report-kpi__label">Balance del periodo</span>
+        <span class="report-kpi__value">${{ reporte.balance | number:'1.0-0' }}</span>
+        <span class="report-kpi__hint">Ingresos − egresos</span>
+      </article>
+      <article class="report-kpi report-kpi--neutral">
+        <span class="report-kpi__label">Movimientos</span>
+        <span class="report-kpi__value">{{ reporte.cantidadVentas }}</span>
+        <span class="report-kpi__hint">Registros en el rango</span>
+      </article>
+    </div>
+
+    <div class="report-table-wrap" *ngIf="!cargando && reporte && ventasDetalle.length">
+      <h3 class="report-subheading">Detalle de movimientos</h3>
+      <div class="table-responsive">
+        <table class="table report-table">
+          <caption class="sr-only">Listado de ventas del periodo seleccionado</caption>
+          <thead>
+            <tr>
+              <th scope="col">Fecha</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Descripción</th>
+              <th scope="col" class="text-right">Total</th>
+              <th scope="col">Retiro</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of ventasDetalle">
+              <td>{{ v.createAt | date:'dd/MM/y':'':'es' }}</td>
+              <td>
+                <span class="report-pill" [class.report-pill--egreso]="esEgreso(v)">
+                  {{ esEgreso(v) ? 'Egreso' : 'Ingreso' }}
+                </span>
+              </td>
+              <td>{{ v.cliente?.nombre || '—' }}</td>
+              <td>{{ v.descripcion || '—' }}</td>
+              <td class="text-right text-nowrap">${{ v.total | number:'1.0-0' }}</td>
+              <td>{{ v.retiroExcedente ? 'Sí' : '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="cargandoMetricas" class="report-loading mt-3">Cargando métricas operativas…</div>
+
+    <h3 class="report-subheading mt-4 mb-2" *ngIf="!cargandoMetricas && metricas">Métricas del periodo</h3>
+    <div class="report-metrics-grid" *ngIf="!cargandoMetricas && metricas">
+      <article class="report-metric-tile">
+        <span class="report-metric-tile__label">Ventas (ingreso)</span>
+        <span class="report-metric-tile__value">{{ metricas.cantidadVentasTipoIngreso }}</span>
+      </article>
+      <article class="report-metric-tile">
+        <span class="report-metric-tile__label">Compras (egreso)</span>
+        <span class="report-metric-tile__value">{{ metricas.cantidadComprasTipoEgreso }}</span>
+      </article>
+      <article class="report-metric-tile">
+        <span class="report-metric-tile__label">Retiros de excedente</span>
+        <span class="report-metric-tile__value">{{ metricas.cantidadRetirosExcedente }}</span>
+      </article>
+      <article class="report-metric-tile report-metric-tile--wide">
+        <span class="report-metric-tile__label">Material por monto (top)</span>
+        <ul class="report-metric-list mb-0">
+          <li *ngFor="let r of metricas.topMaterialesPorMonto">
+            <strong>{{ r.material }}</strong>
+            — ${{ r.monto | number:'1.0-0' }}
+            <span class="text-muted">({{ r.kilos | number:'1.0-2' }} kg)</span>
+          </li>
+          <li *ngIf="!metricas.topMaterialesPorMonto?.length" class="text-muted">Sin datos de ítems en el rango.</li>
+        </ul>
+      </article>
+      <article class="report-metric-tile report-metric-tile--wide">
+        <span class="report-metric-tile__label">Clientes por monto (frecuencia)</span>
+        <ul class="report-metric-list mb-0">
+          <li *ngFor="let r of metricas.topClientesPorMonto">
+            <strong>{{ r.cliente }}</strong>
+            — ${{ r.monto | number:'1.0-0' }}
+            <span class="text-muted">({{ r.operaciones }} ops.)</span>
+          </li>
+          <li *ngIf="!metricas.topClientesPorMonto?.length" class="text-muted">Sin movimientos con cliente en el rango.</li>
+        </ul>
+      </article>
+    </div>
+
+    <p class="report-empty" *ngIf="!cargando && reporte && !ventasDetalle.length">
+      No hay movimientos en el periodo seleccionado. Ajuste las fechas o registre ventas.
+    </p>
+  </section>
+
+  <section class="report-section app-card" aria-labelledby="material-heading">
+    <div class="report-section__head report-section__head--split">
+      <div>
+        <h2 id="material-heading" class="report-section__title">Material reciclado por mes</h2>
+        <p class="report-section__meta">
+          Cantidades agregadas por tipo de producto y mes calendario.
+          <ng-container *ngIf="materialPorMes?.length">
+            Volumen total en tabla: <strong>{{ totalMaterial | number:'1.0-2' }}</strong> unidades sumadas.
+          </ng-container>
+        </p>
+      </div>
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="cargarMaterial()">Actualizar datos</button>
+    </div>
+
+    <div *ngIf="cargandoMaterial" class="report-loading">Cargando consolidado de material…</div>
+
+    <div class="table-responsive" *ngIf="!cargandoMaterial && materialPorMes?.length">
+      <table class="table report-table report-table--material">
+        <caption class="sr-only">Cantidades de material por año, mes y tipo</caption>
+        <thead>
+          <tr>
+            <th scope="col">Año</th>
+            <th scope="col">Mes</th>
+            <th scope="col">Material</th>
+            <th scope="col" class="text-right">Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of materialPorMes">
+            <td class="text-nowrap">{{ row.anio }}</td>
+            <td>{{ mesNombre(row.mes) }}</td>
+            <td>{{ row.material }}</td>
+            <td class="text-right text-nowrap">{{ row.cantidad | number:'1.0-2' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-right font-weight-bold">Total</td>
+            <td class="text-right text-nowrap font-weight-bold">{{ totalMaterial | number:'1.0-2' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <p class="report-empty mb-0" *ngIf="!cargandoMaterial && !materialPorMes?.length">
+      Aún no hay datos agrupables. Registre ventas con ítems de producto para alimentar este reporte.
+    </p>
+  </section>
+</div>

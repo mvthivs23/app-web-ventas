@@ -1,4 +1,76 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: #f4f7fb;
+  color: #0f172a;
+}
+
+.app-main {
+  min-height: calc(100vh - 140px);
+  padding: 1.25rem 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.section-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+a {
+  color: #0d6efd;
+}
+
+.auth-layout {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(160deg, #f8fafc 0%, #e9f0ff 45%, #f3fff6 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.auth-card--wide {
+  max-width: 760px;
+}
+
+.auth-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  color: #0f172a;
+}
+
+.auth-sub {
+  color: #64748b;
+  margin-bottom: 1.5rem;
+}
+
+.auth-footer a {
+  font-weight: 600;
+}
